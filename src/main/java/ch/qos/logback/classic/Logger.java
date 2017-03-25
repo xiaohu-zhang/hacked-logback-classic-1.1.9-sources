@@ -536,17 +536,20 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger, Appe
     }
 
     private ILogbackAdvice getAdvice(){
-        try {
-            ILogbackAdvice  adviceClassObject = adviceMap.get(Thread.currentThread().getContextClassLoader());
-            if(adviceClassObject == null){
-                Class<?>  adviceClass = Thread.currentThread().getContextClassLoader().loadClass("LogbackAdvice");
-                adviceClassObject = (ILogbackAdvice)adviceClass.newInstance();
-                adviceMap.put(Thread.currentThread().getContextClassLoader(), adviceClassObject);
-            }
+        if(adviceMap != null){
+            try {
+                ILogbackAdvice  adviceClassObject = adviceMap.get(Thread.currentThread().getContextClassLoader());
+                if(adviceClassObject == null){
+                    Class<?>  adviceClass = Thread.currentThread().getContextClassLoader().loadClass("LogbackAdvice");
+                    adviceClassObject = (ILogbackAdvice)adviceClass.newInstance();
+                    adviceMap.put(Thread.currentThread().getContextClassLoader(), adviceClassObject);
+                }
                 return adviceClassObject;
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            // TODO Auto-generated catch block
-           //there is no need for advicing do nothing
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                //there is no need for advicing do nothing
+                adviceMap = null;
+            }
         }
        return null;
     }
